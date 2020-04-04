@@ -11,6 +11,10 @@ app.use(
   })
 );
 app.use(express.json());
+// listening for the server
+app.listen(PORT, () => {
+  console.log(`App is up on http://localhost:${PORT}`);
+});
 // saving new notes in the db file and displaying them
 app.post("/api/notes", function (req, res) {
   let noteList = notesJSON.length.toString();
@@ -31,17 +35,21 @@ app.get("/api/notes/:id", function (req, res) {
   res.json(saveNote[Number(req.params.id)]);
 });
 // delete function for notes you don't want
-app.delete("/api/notes/:id", function(req, res){
-    let notesJSON = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
-    let ID = req.params.id;
-    let deltedID = 0;
-    notesJSON = notesJSON.filter((current) => {
-        return current.id !=ID;
-    });
-for (current of notesJSON) {
+app.delete("/api/notes/:id", function (req, res) {
+  let notesJSON = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+  let ID = req.params.id;
+  let deltedID = 0;
+  notesJSON = notesJSON.filter((current) => {
+    return current.id != ID;
+  });
+  for (current of notesJSON) {
     current.id = deltedID.toString();
     deltedID++;
-}
-fs.writeFileSync("./db/db.json", JSON.stringify(notesJSON));
-res.json(notesJSON);
+  }
+  fs.writeFileSync("./db/db.json", JSON.stringify(notesJSON));
+  res.json(notesJSON);
+});
+// grabing the html file to display
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "/public/index.html"));
 });
